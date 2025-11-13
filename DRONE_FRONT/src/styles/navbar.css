@@ -1,0 +1,268 @@
+/* ====================================
+   🧭 NAVBAR - BARRA LATERAL
+   ==================================== */
+
+.navbar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 260px;
+  background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden; /* Evita scroll en el contenedor principal */
+}
+
+/* Header del navbar */
+.navbar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0; /* No se comprime */
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.navbar-logo-icon {
+  font-size: 2rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.navbar-logo h2 {
+  margin: 0;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.navbar-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin: 0;
+  padding-left: 44px;
+}
+
+/* Menú de navegación con scroll */
+.navbar-menu {
+  list-style: none;
+  padding: 16px 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto; /* Scroll solo en el menú */
+  overflow-x: hidden;
+}
+
+/* Estilos personalizados del scrollbar */
+.navbar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navbar-menu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.navbar-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.navbar-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-menu li {
+  margin-bottom: 4px;
+}
+
+.navbar-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  text-align: left;
+}
+
+.navbar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding-left: 24px;
+}
+
+.navbar-item.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-weight: 600;
+  box-shadow: inset 4px 0 0 white;
+}
+
+.navbar-item-icon {
+  font-size: 1.5rem;
+  min-width: 28px;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-item-text {
+  flex: 1;
+}
+
+.navbar-item-indicator {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Footer del navbar - siempre visible */
+.navbar-footer {
+  padding: 16px 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0; /* No se comprime */
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.navbar-user-icon {
+  font-size: 2rem;
+}
+
+.navbar-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-user-role {
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.navbar-user-status {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+.navbar-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navbar-logout:hover {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: rgba(239, 68, 68, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.navbar-logout span {
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 0;
+  }
+
+  .navbar-header {
+    padding: 16px;
+  }
+
+  .navbar-menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    overflow: visible;
+  }
+
+  .navbar-menu li {
+    flex: 0 0 auto;
+    margin: 0;
+  }
+
+  .navbar-item {
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+
+  .navbar-item:hover {
+    padding-left: 16px;
+  }
+
+  .navbar-item-text {
+    display: none;
+  }
+
+  .navbar-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .navbar-user {
+    flex: 1;
+  }
+}

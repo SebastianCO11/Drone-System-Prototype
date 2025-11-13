@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { Auth } from '../api'
+import "../styles/login.css";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState('')
@@ -37,58 +38,93 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>🚀 Iniciar Sesión</h2>
-      <form onSubmit={handleLogin} style={styles.form}>
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={styles.input}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={styles.input}
-        />
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? 'Cargando...' : 'Ingresar'}
-        </button>
-      </form>
-      {error && <p style={styles.error}>{error}</p>}
+    <div className="login-page">
+      <div className="login-background">
+        <div className="drone-icon">🚁</div>
+        <div className="drone-icon drone-2">🤖</div>
+        <div className="drone-icon drone-3">📦</div>
+      </div>
+
+      <div className="login-container">
+        <div className="login-header">
+          <div className="logo">
+            <span className="logo-icon">🚀</span>
+            <h1>DroneDelivery</h1>
+          </div>
+          <p className="subtitle">Sistema de entregas autónomas</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="input-group">
+            <label htmlFor="email">Correo electrónico</label>
+            <div className="input-wrapper">
+              <span className="input-icon">📧</span>
+              <input
+                id="email"
+                type="email"
+                placeholder="usuario@empresa.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="login-input"
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="password">Contraseña</label>
+            <div className="input-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="login-input"
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className={`login-button ${loading ? 'loading' : ''}`}
+          >
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Verificando...
+              </>
+            ) : (
+              <>
+                <span>Iniciar Sesión</span>
+                <span className="arrow">→</span>
+              </>
+            )}
+          </button>
+
+          {error && (
+            <div className="error-message">
+              <span className="error-icon">⚠️</span>
+              {error}
+            </div>
+          )}
+        </form>
+
+        <div className="login-footer">
+          <button 
+            type="button"
+            onClick={() => window.location.href = '/recuperar-contraseña'}
+            className="forgot-password-link"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+          <p>Sistema seguro de autenticación</p>
+        </div>
+      </div>
     </div>
   )
 }
 
-const styles = {
-  container: {
-    maxWidth: 400,
-    margin: '100px auto',
-    textAlign: 'center',
-    padding: 20,
-    border: '1px solid #ccc',
-    borderRadius: 10
-  },
-  title: { marginBottom: 20 },
-  form: { display: 'flex', flexDirection: 'column', gap: 10 },
-  input: {
-    padding: '10px',
-    fontSize: '1rem',
-    borderRadius: 5,
-    border: '1px solid #bbb'
-  },
-  button: {
-    padding: '10px',
-    background: '#2563eb',
-    color: 'white',
-    border: 'none',
-    borderRadius: 5,
-    cursor: 'pointer'
-  },
-  error: { color: 'red', marginTop: 10 }
-}

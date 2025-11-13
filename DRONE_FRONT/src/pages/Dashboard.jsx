@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
-import Navbar from '../components/Navbar'
+import Navbar from '../pages/Navbar'
+import DataTable from '../pages/DataTable'
 import { Auth, UsersAPI, DispositivosAPI, ReservasAPI, ServiciosAPI, ClimaAPI, LogsAPI } from '../api'
+import '../styles/dashboard.css'
 
 export default function Dashboard({ onLogout }) {
   const [role, setRole] = useState(null)
   const [view, setView] = useState('Reservas')
   const [data, setData] = useState([])
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  // 🔹 Obtener el rol del usuario actual desde el token y (si es posible) desde la API
+  // 🔹 Obtener el rol del usuario actual desde el token
   useEffect(() => {
     async function fetchRole() {
       try {
@@ -18,17 +21,14 @@ export default function Dashboard({ onLogout }) {
         const decoded = Auth.decodeToken(token)
         const userId = decoded?.sub
 
-        // Intentar obtener detalles del usuario desde el backend
         try {
           const users = await UsersAPI.getAll()
           const user = users.find(u => u.id === userId)
           if (user && user.role) return setRole(user.role)
         } catch (err) {
-          // Si falla (403/401) asumimos que el backend no permite listar users
-          console.warn('No se pudo consultar /users para resolver rol, aplicando fallback')
+          console.warn('No se pudo consultar /users, aplicando fallback')
         }
 
-        // Fallback: si no podemos consultar, marcar como 'consultor' por seguridad
         setRole('consultor')
       } catch (err) {
         console.error('Error obteniendo rol:', err)
@@ -43,79 +43,118 @@ export default function Dashboard({ onLogout }) {
   useEffect(() => {
     setData([])
     setError(null)
+    setLoading(true)
 
     async function loadData() {
       try {
-        if (view === 'Usuarios') setData(await UsersAPI.getAll())
-        if (view === 'Dispositivos') setData(await DispositivosAPI.getAll())
-        if (view === 'Reservas') setData(await ReservasAPI.getAll())
-        if (view === 'Servicios') setData(await ServiciosAPI.getAll())
-        if (view === 'Clima') setData(await ClimaAPI.getAll())
-        if (view === 'Logs') setData(await LogsAPI.getAll())
+        let result = []
+        
+        switch(view) {
+          case 'Usuarios':
+            result = await UsersAPI.getAll()
+            break
+          case 'Dispositivos':
+            result = await DispositivosAPI.getAll()
+            break
+          case 'Reservas':
+            result = await ReservasAPI.getAll()
+            break
+          case 'Servicios':
+            result = await ServiciosAPI.getAll()
+            break
+          case 'Clima':
+            result = await ClimaAPI.getAll()
+            break
+          case 'Logs':
+            result = await LogsAPI.getAll()
+            break
+          default:
+            result = []
+        }
+        
+        setData(result)
       } catch (err) {
         setError(err.message || String(err))
+      } finally {
+        setLoading(false)
       }
     }
 
     loadData()
   }, [view])
 
+  // 🔹 Iconos para cada vista
+  const viewIcons = {
+    'Usuarios': '👥',
+    'Dispositivos': '🤖',
+    'Reservas': '📦',
+    'Servicios': '🚁',
+    'Clima': '🌤️',
+    'Logs': '📋'
+  }
+
   // 🔹 Mostrar carga inicial
-  if (!role) return <p>Cargando sesión...</p>
+  if (!role) {
+    return (
+      <div className="dashboard-loading">
+        <div className="loading-spinner"></div>
+        <p>Cargando sesión...</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="app-root">
-      <Navbar role={role} onSelect={setView} onLogout={() => { Auth.clear(); onLogout?.() }} current={view} />
+    <div className="dashboard-root">
+      <Navbar 
+        role={role} 
+        onSelect={setView} 
+        onLogout={() => { Auth.clear(); onLogout?.() }} 
+        current={view} 
+      />
 
-      <main className="app-content">
-        <section className="page-head">
-          <h2>{view}</h2>
-        </section>
+      <main className="dashboard-content">
+        {/* Header de la página actual */}
+        <header className="dashboard-header">
+          <div className="header-title">
+            <span className="header-icon">{viewIcons[view] || '📊'}</span>
+            <h1>{view}</h1>
+          </div>
+          <div className="header-info">
+            <span className="user-badge">👤 {role}</span>
+            <span className="records-count">
+              {data.length} {data.length === 1 ? 'registro' : 'registros'}
+            </span>
+          </div>
+        </header>
 
-        {error && <p className="error">{error}</p>}
+        {/* Mensajes de error */}
+        {error && (
+          <div className="error-banner">
+            <span className="error-icon">⚠️</span>
+            <span>{error}</span>
+          </div>
+        )}
 
-        <section className="page-body">
-          {data.length === 0 ? (
-            <div className="card">Sin registros disponibles.</div>
+        {/* Contenido principal */}
+        <section className="dashboard-body">
+          {loading ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>Cargando datos...</p>
+            </div>
+          ) : data.length === 0 ? (
+            <div className="empty-state">
+              <span className="empty-icon">📭</span>
+              <h3>Sin registros disponibles</h3>
+              <p>No hay datos para mostrar en esta sección</p>
+            </div>
           ) : (
-            <div className="card">
-              <GenericTable data={data} view={view} />
+            <div className="data-card">
+              <DataTable data={data} view={view} />
             </div>
           )}
         </section>
       </main>
     </div>
   )
-}
-
-function GenericTable({ data = [], view }) {
-  // Si es un listado de objetos similares, renderizamos claves como columnas
-  const keys = Array.from(new Set(data.flatMap(d => Object.keys(d || {}))))
-
-  return (
-    <table className="data-table">
-      <thead>
-        <tr>
-          {keys.map(k => (
-            <th key={k}>{k}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, i) => (
-          <tr key={i}>
-            {keys.map(k => (
-              <td key={k}>{renderCell(row[k])}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
-}
-
-function renderCell(value) {
-  if (value === null || value === undefined) return ''
-  if (typeof value === 'object') return JSON.stringify(value)
-  return String(value)
 }
