@@ -134,4 +134,38 @@ router.get('/logs', checkRole('admin'), async (req, res) => {
   res.json(data)
 })
 
+// ======================================================
+// 🛰️ TRAYECTOS (rutas con secuencia de imágenes)
+// ======================================================
+router.get('/trayectos', checkRole('admin', 'operador', 'consultor'), async (req, res) => {
+  const { data, error } = await supabase.from('trayectos').select('*')
+  if (error) return res.status(400).json({ error: error.message })
+  res.json(data)
+})
+
+router.get('/trayectos/:id', checkRole('admin', 'operador', 'consultor'), async (req, res) => {
+  const { id } = req.params
+  const { data, error } = await supabase
+    .from('trayectos')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) return res.status(404).json({ error: 'Trayecto no encontrado' })
+  res.json(data)
+})
+
+router.post('/trayectos', checkRole('admin', 'operador'), async (req, res) => {
+  const { nombre, imagenes, servicio_id } = req.body
+
+  const { data, error } = await supabase.from('trayectos').insert({
+    nombre,
+    imagenes,
+    servicio_id
+  })
+
+  if (error) return res.status(400).json({ error: error.message })
+  res.json(data)
+})
+
 export default router

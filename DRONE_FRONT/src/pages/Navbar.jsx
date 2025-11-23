@@ -3,6 +3,7 @@ import '../styles/navbar.css'
 export default function Navbar({ role, onSelect, onLogout, current }) {
   const menuItems = [
     { name: 'Reservas', icon: '📦', roles: ['admin', 'operador', 'consultor'] },
+    { name: 'Rutas', icon: '📍', roles: ['admin', 'operador', 'consultor'] },
     { name: 'Dispositivos', icon: '🤖', roles: ['admin', 'operador'] },
     { name: 'Servicios', icon: '🚁', roles: ['admin', 'operador'] },
     { name: 'Clima', icon: '🌤️', roles: ['admin', 'operador', 'consultor'] },

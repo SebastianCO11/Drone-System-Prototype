@@ -80,6 +80,15 @@ export const LogsAPI = {
 }
 
 // ======================================================
+// 🛰️ TRAYECTOS
+// ======================================================
+export const TrayectosAPI = {
+  getAll: () => request('/trayectos'),
+  getById: (id) => request(`/trayectos/${id}`),
+  create: (data) => request('/trayectos', 'POST', data),
+}
+
+// ======================================================
 // 🧠 Utilidades de sesión
 // ======================================================
 export const Auth = {

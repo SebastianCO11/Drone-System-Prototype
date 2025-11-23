@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Navbar from '../pages/Navbar'
 import DataTable from '../pages/DataTable'
+import RoutesPanel from '../pages/RoutesPanel'
 import { Auth, UsersAPI, DispositivosAPI, ReservasAPI, ServiciosAPI, ClimaAPI, LogsAPI } from '../api'
 import '../styles/dashboard.css'
 
@@ -48,8 +49,8 @@ export default function Dashboard({ onLogout }) {
     async function loadData() {
       try {
         let result = []
-        
-        switch(view) {
+
+        switch (view) {
           case 'Usuarios':
             result = await UsersAPI.getAll()
             break
@@ -68,10 +69,14 @@ export default function Dashboard({ onLogout }) {
           case 'Logs':
             result = await LogsAPI.getAll()
             break
+          case 'Rutas':
+            // Rutas se carga internamente en RoutesPanel
+            result = []
+            break
           default:
             result = []
         }
-        
+
         setData(result)
       } catch (err) {
         setError(err.message || String(err))
@@ -80,7 +85,11 @@ export default function Dashboard({ onLogout }) {
       }
     }
 
-    loadData()
+    if (view !== 'Rutas') {
+      loadData()
+    } else {
+      setLoading(false)
+    }
   }, [view])
 
   // 🔹 Iconos para cada vista
@@ -90,7 +99,8 @@ export default function Dashboard({ onLogout }) {
     'Reservas': '📦',
     'Servicios': '🚁',
     'Clima': '🌤️',
-    'Logs': '📋'
+    'Logs': '📋',
+    'Rutas': '📍'
   }
 
   // 🔹 Mostrar carga inicial
@@ -105,11 +115,11 @@ export default function Dashboard({ onLogout }) {
 
   return (
     <div className="dashboard-root">
-      <Navbar 
-        role={role} 
-        onSelect={setView} 
-        onLogout={() => { Auth.clear(); onLogout?.() }} 
-        current={view} 
+      <Navbar
+        role={role}
+        onSelect={setView}
+        onLogout={() => { Auth.clear(); onLogout?.() }}
+        current={view}
       />
 
       <main className="dashboard-content">
@@ -122,7 +132,7 @@ export default function Dashboard({ onLogout }) {
           <div className="header-info">
             <span className="user-badge">👤 {role}</span>
             <span className="records-count">
-              {data.length} {data.length === 1 ? 'registro' : 'registros'}
+              {view === 'Rutas' ? '-' : `${data.length} ${data.length === 1 ? 'registro' : 'registros'}`}
             </span>
           </div>
         </header>
@@ -137,7 +147,9 @@ export default function Dashboard({ onLogout }) {
 
         {/* Contenido principal */}
         <section className="dashboard-body">
-          {loading ? (
+          {view === 'Rutas' ? (
+            <RoutesPanel />
+          ) : loading ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
               <p>Cargando datos...</p>
