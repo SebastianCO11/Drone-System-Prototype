@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import '../styles/forgot-password.css'
 
-export default function ForgotPassword() {
+export default function ForgotPassword({ onBack }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
@@ -29,15 +29,17 @@ export default function ForgotPassword() {
     }
   }
 
-const goBack = () => {
-    onBack?.()
+  const goBack = () => {
+    if (onBack) {
+      onBack()
+    }
   }
 
   return (
     <div className="forgot-password-page">
       <div className="forgot-password-background">
         <div className="drone-icon">🚁</div>
-        <div className="drone-icon drone-2">🔑</div>
+        <div className="drone-icon drone-2">🔒</div>
         <div className="drone-icon drone-3">📧</div>
       </div>
 

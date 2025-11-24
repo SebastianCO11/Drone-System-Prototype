@@ -1,73 +1,341 @@
 /* ================================
-   CONTENEDOR GENERAL DE LA PÁGINA
+   VARIABLES CSS (Custom Properties)
 ================================ */
-.page-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding-top: 40px;
+:root {
+  /* Colores principales */
+  --primary-color: #4a72ff;
+  --primary-hover: #355ff0;
+  --primary-light: #5b82ff;
+  
+  /* Grises */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #374151;
+  --gray-900: #111827;
+  
+  /* Colores de estado */
+  --success-bg: #ecfdf5;
+  --success-border: #86efac;
+  --success-text: #065f46;
+  
+  --warning-bg: #fffbeb;
+  --warning-border: #fcd34d;
+  --warning-text: #92400e;
+  
+  --error-bg: #fef2f2;
+  --error-border: #fecaca;
+  --error-text: #991b1b;
+  
+  --info-bg: #eff6ff;
+  --info-border: #93c5fd;
+  --info-text: #1e40af;
+  
+  /* Espaciado */
+  --spacing-xs: 6px;
+  --spacing-sm: 12px;
+  --spacing-md: 18px;
+  --spacing-lg: 25px;
+  --spacing-xl: 35px;
+  
+  /* Bordes */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12);
+  
+  /* Transiciones */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.35s ease;
 }
 
 /* ================================
-   FORMULARIO DE RESERVA (CARD)
+   RESET Y BASE
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================================
+   CONTENEDOR GENERAL
+================================ */
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+}
+
+/* ================================
+   CARD/CONTENEDOR DE RESERVA
 ================================ */
 .reserva-container {
   background: white;
-  padding: 30px;
-  border-radius: 15px;
-  max-width: 480px;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  max-width: 520px;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  animation: fadeInUp 0.4s ease;
 }
 
-/* Título */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Título principal */
 .reserva-container h2 {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 22px;
+  margin-bottom: var(--spacing-lg);
+  font-size: clamp(22px, 5vw, 26px);
+  font-weight: 700;
+  color: var(--gray-900);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
-/* Formulario interno */
+/* Subtítulos */
+.reserva-container h3 {
+  color: var(--gray-900);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0 12px 0;
+  text-align: left;
+}
+
+/* Párrafos */
+.reserva-container p {
+  color: var(--gray-500);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ================================
+   FORMULARIO
+================================ */
 .reserva-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-md);
 }
 
 /* Labels */
 .reserva-form label {
   font-weight: 600;
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-bottom: var(--spacing-xs);
+  display: block;
+  transition: color var(--transition-fast);
 }
 
-/* Inputs y selects */
+.reserva-form label:hover {
+  color: var(--gray-900);
+}
+
+/* Inputs, Selects y Textareas - Estilos base */
 .reserva-form select,
-.reserva-form input {
+.reserva-form input,
+.reserva-input,
+.feedback-textarea,
+.feedback-select {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--gray-200);
   font-size: 15px;
-  box-sizing: border-box;
+  color: var(--gray-900);
+  background: white;
+  transition: all var(--transition-normal);
+  font-family: inherit;
+  appearance: none;
 }
 
-/* Botón de enviar */
-.reserva-form button {
-  margin-top: 10px;
+/* Select personalizado */
+.reserva-form select,
+.feedback-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23374151' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+/* Estados de focus */
+.reserva-form select:focus,
+.reserva-form input:focus,
+.reserva-input:focus,
+.feedback-textarea:focus,
+.feedback-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(74, 114, 255, 0.1);
+  background: white;
+}
+
+/* Estados de hover */
+.reserva-form select:hover,
+.reserva-form input:hover,
+.reserva-input:hover,
+.feedback-select:hover {
+  border-color: var(--gray-300);
+}
+
+/* Placeholders */
+.reserva-form input::placeholder,
+.reserva-input::placeholder,
+.feedback-textarea::placeholder {
+  color: var(--gray-400);
+  opacity: 1;
+}
+
+/* Estados deshabilitados */
+.reserva-form select:disabled,
+.reserva-form input:disabled,
+.reserva-input:disabled {
+  background: var(--gray-50);
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-color: var(--gray-200);
+}
+
+/* Textarea específico */
+.feedback-textarea {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.6;
+  padding: 14px 16px;
+}
+
+/* ================================
+   BOTONES
+================================ */
+
+/* Botón primario */
+.reserva-form button,
+.reserva-button,
+.feedback-btn {
   width: 100%;
-  padding: 12px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 10px;
-  background: #4a72ff;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.25s;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(74, 114, 255, 0.25);
+  letter-spacing: 0.3px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
 }
 
-.reserva-form button:hover {
-  background: #355ff0;
+/* Efecto de brillo en hover */
+.reserva-form button::before,
+.reserva-button::before,
+.feedback-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.reserva-form button:hover::before,
+.reserva-button:hover::before,
+.feedback-btn:hover::before {
+  left: 100%;
+}
+
+.reserva-form button:hover,
+.reserva-button:hover,
+.feedback-btn:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 114, 255, 0.35);
+}
+
+.reserva-form button:active,
+.reserva-button:active,
+.feedback-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(74, 114, 255, 0.25);
+}
+
+/* Botón deshabilitado */
+.reserva-form button:disabled,
+.reserva-button:disabled,
+.feedback-btn:disabled {
+  background: var(--gray-300) !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+  color: var(--gray-500) !important;
+}
+
+.reserva-form button:disabled:hover,
+.reserva-button:disabled:hover,
+.feedback-btn:disabled:hover {
+  transform: none !important;
+}
+
+/* Botón secundario */
+.reiniciar-btn,
+.reserva-secondary {
+  width: 100%;
+  padding: 13px 20px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--gray-600);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  margin-top: 12px;
+}
+
+.reiniciar-btn:hover,
+.reserva-secondary:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: var(--gray-900);
 }
 
 /* ================================
@@ -75,15 +343,45 @@
 ================================ */
 .recorrido-container {
   text-align: center;
-  margin-top: 40px;
+  padding: 40px 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.recorrido-container h2 {
+  color: var(--gray-900);
+  font-size: clamp(24px, 5vw, 30px);
+  font-weight: 700;
+  margin-bottom: 12px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.recorrido-container p {
+  color: var(--gray-500);
+  font-size: 16px;
+  margin-bottom: 30px;
 }
 
 .recorrido-imagen {
-  width: 500px;
-  max-width: 90%;
+  max-width: min(600px, 90%);
   height: auto;
-  border-radius: 15px;
-  margin-top: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 3px solid var(--gray-200);
+  transition: transform var(--transition-slow);
+}
+
+.recorrido-imagen:hover {
+  transform: scale(1.02);
 }
 
 /* ================================
@@ -91,214 +389,262 @@
 ================================ */
 .codigo-container {
   text-align: center;
-  max-width: 350px;
+  max-width: 450px;
   margin: 40px auto;
+  background: white;
+  padding: 45px 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  animation: fadeInUp 0.4s ease;
+}
+
+.codigo-container h2 {
+  color: var(--gray-900);
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.codigo-container p {
+  color: var(--gray-500);
+  font-size: 15px;
+  margin-bottom: 30px;
+  line-height: 1.5;
 }
 
 .codigo-container input {
-  width: 160px;
+  width: 220px;
   text-align: center;
-  font-size: 22px;
-  letter-spacing: 4px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  font-size: 32px;
+  letter-spacing: 16px;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  border: 3px solid var(--gray-300);
+  color: var(--gray-900);
+  font-weight: 700;
+  transition: all var(--transition-normal);
+  background: var(--gray-50);
+  text-transform: uppercase;
+}
+
+.codigo-container input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 5px rgba(74, 114, 255, 0.1);
+  background: white;
 }
 
 .codigo-container button {
-  margin-top: 20px;
-  padding: 12px 20px;
-  background: #4a72ff;
+  margin-top: 28px;
+  padding: 15px 40px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
   font-weight: 600;
-  border-radius: 10px;
+  border: none;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: 0.25s;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(74, 114, 255, 0.25);
+  font-size: 16px;
 }
 
 .codigo-container button:hover {
-  background: #355ff0;
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 114, 255, 0.35);
 }
 
 /* ================================
-   FEEDBACK FINAL
+   CAJAS DE INFORMACIÓN (CLIMA)
+================================ */
+.clima-box {
+  margin-top: 15px;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--info-bg) 0%, #dbeafe 100%);
+  border: 2px solid var(--info-border);
+  border-left: 5px solid var(--info-text);
+  border-radius: var(--radius-md);
+  color: var(--info-text);
+  font-size: 14px;
+  line-height: 1.7;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+}
+
+.clima-box p {
+  margin: 8px 0;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clima-box p:first-of-type {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: var(--info-text);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--info-border);
+}
+
+.clima-box strong {
+  font-weight: 600;
+}
+
+/* Alerta de clima adverso */
+.clima-alerta {
+  margin-top: 15px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--error-bg) 0%, #fee2e2 100%);
+  border: 2px solid var(--error-border);
+  border-left: 5px solid var(--error-text);
+  color: var(--error-text);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 600;
+  animation: alertaShake 0.5s ease;
+}
+
+@keyframes alertaShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ================================
+   FEEDBACK CARD
 ================================ */
 .feedback-card {
   background: white;
-  padding: 30px;
-  border-radius: 20px;
-  max-width: 480px;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  max-width: 520px;
   width: 100%;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
   text-align: center;
+  animation: fadeInUp 0.4s ease;
 }
 
 .feedback-container h3 {
   margin-bottom: 10px;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 700;
+  color: var(--gray-900);
+  letter-spacing: -0.3px;
 }
 
-/* Comentarios */
-.feedback-textarea {
-  width: 100%;
-  height: 120px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  resize: none;
-  box-sizing: border-box;
-  margin-top: 10px;
-}
-
-/* Select de calificación */
-.feedback-select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-/* Botón enviar opinión */
-.feedback-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 18px;
-  border: none;
-  border-radius: 12px;
-  background: #4a72ff;
-  color: white;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.feedback-btn:hover {
-  background: #355ff0;
-  transform: translateY(-2px);
-}
-
-/* Botón reiniciar */
-.reiniciar-btn {
-  margin-top: 12px;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: #e5e7eb;
-  color: #333;
+.feedback-container p {
+  color: var(--gray-500);
   font-size: 15px;
-  cursor: pointer;
-  transition: 0.25s;
+  margin-bottom: 20px;
 }
 
-.reiniciar-btn:hover {
-  background: #d1d5db;
-  transform: translateY(-2px);
-}
-/* INPUT UNIFORME (para form y feedback) */
-.reserva-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 15px;
-  box-sizing: border-box;
-}
-
-/* Botón principal (igual que el del formulario) */
-.reserva-button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #4a72ff;
-  color: white;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.reserva-button:hover {
-  background: #355ff0;
-  transform: translateY(-2px);
-}
-
-/* Botón secundario */
-.reserva-secondary {
-  margin-top: 12px;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #e5e7eb;
-  color: #333;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.25s;
+/* ================================
+   RESPONSIVE
+================================ */
+@media (max-width: 640px) {
+  .page-container {
+    padding: 20px 12px;
+  }
+  
+  .reserva-container,
+  .feedback-card {
+    padding: 25px 20px;
+    margin: 0;
+  }
+  
+  .reserva-container h2,
+  .feedback-container h3 {
+    font-size: 20px;
+  }
+  
+  .codigo-container {
+    padding: 30px 20px;
+  }
+  
+  .codigo-container input {
+    width: 180px;
+    font-size: 24px;
+    letter-spacing: 10px;
+    padding: 14px 16px;
+  }
+  
+  .recorrido-imagen {
+    max-width: 100%;
+  }
+  
+  .reserva-form select,
+  .reserva-form input,
+  .reserva-input {
+    font-size: 16px; /* Previene zoom en iOS */
+  }
 }
 
-.reserva-secondary:hover {
-  background: #d1d5db;
-  transform: translateY(-2px);
+@media (max-width: 400px) {
+  .reserva-container h2 {
+    font-size: 18px;
+  }
+  
+  .clima-box,
+  .clima-alerta {
+    font-size: 13px;
+    padding: 14px;
+  }
 }
 
-/* ===============================
-   ADVERTENCIA DE CLIMA
-================================= */
-.clima-alerta {
-  margin-top: 12px;
-  padding: 12px;
-  background: #ffe4e6;         /* Rosado claro */
-  border: 1px solid #fda4af;   /* Borde rosado */
-  color: #b91c1c;              /* Rojo fuerte */
-  border-radius: 10px;
-  font-size: 14px;
-  line-height: 1.4;
-  font-weight: 500;
-  animation: alertaFade 0.2s ease-in-out;
+/* ================================
+   ACCESIBILIDAD
+================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-@keyframes alertaFade {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
+/* Focus visible para navegación por teclado */
+:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
-/* ===============================
-   BOTÓN DESHABILITADO
-================================= */
-.reserva-form button:disabled {
-  background: #9ca3af !important;      /* Gris */
-  cursor: not-allowed !important;
-  opacity: 0.7;
-  transform: none !important;
-  box-shadow: none !important;
+/* Mejora de contraste para modo oscuro del sistema */
+@media (prefers-color-scheme: dark) {
+  /* Aquí puedes agregar estilos para modo oscuro si lo deseas */
 }
 
-/* evitar efecto hover */
-.reserva-form button:disabled:hover {
-  background: #9ca3af !important;
-  transform: none !important;
+/* ================================
+   UTILIDADES
+================================ */
+.text-center {
+  text-align: center;
 }
 
-/* ===============================
-   COMPATIBLE CON BOTONES DE FEEDBACK
-================================= */
-.reserva-button:disabled {
-  background: #9ca3af !important;
-  cursor: not-allowed !important;
-  opacity: 0.7;
-}
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-md); }
+.mt-3 { margin-top: var(--spacing-lg); }
 
-.reserva-button:disabled:hover {
-  background: #9ca3af !important;
-  transform: none !important;
-}
-
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing-md); }
+.mb-3 { margin-bottom: var(--spacing-lg); }

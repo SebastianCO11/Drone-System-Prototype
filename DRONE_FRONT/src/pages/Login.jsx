@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient'
 import { Auth } from '../api'
 import "../styles/login.css";
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, onForgotPassword }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
@@ -35,6 +35,12 @@ export default function Login({ onLogin }) {
     Auth.setToken(token)
     setLoading(false)
     onLogin?.()
+  }
+
+  const handleForgotPasswordClick = () => {
+    if (onForgotPassword) {
+      onForgotPassword()
+    }
   }
 
   return (
@@ -116,7 +122,7 @@ export default function Login({ onLogin }) {
         <div className="login-footer">
           <button 
             type="button"
-            onClick={() => window.location.href = '/recuperar-contraseña'}
+            onClick={handleForgotPasswordClick}
             className="forgot-password-link"
           >
             ¿Olvidaste tu contraseña?
@@ -127,4 +133,3 @@ export default function Login({ onLogin }) {
     </div>
   )
 }
-
