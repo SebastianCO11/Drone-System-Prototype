@@ -1,133 +1,251 @@
-/* .reservas-container {
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 12px;
+/* ================================
+   CONTENEDOR GENERAL DE LA PÁGINA
+================================ */
+.page-container {
   width: 100%;
-  max-width: 550px;
-  margin: 0 auto;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
 }
 
-.reservas-title {
+/* ================================
+   FORMULARIO DE RESERVA (CARD)
+================================ */
+.reserva-container {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Título */
+.reserva-container h2 {
   text-align: center;
   margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 22px;
 }
 
-.reservas-form {
+/* Formulario interno */
+.reserva-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.reservas-form label {
-  font-weight: 600;
-}
-
-.reservas-form select,
-.reservas-form input {
-  padding: 10px;
-  border: 2px solid #dcdcdc;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-.reservas-btn {
-  margin-top: 10px;
-  background-color: #4f46e5;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 17px;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-.reservas-btn:hover {
-  background-color: #4338ca;
-}
-
-.reservas-mensaje {
-  margin-top: 20px;
-  text-align: center;
-  font-weight: 600;
-} */
-.reserva-container {
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  max-width: 450px;
-  margin: auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
+/* Labels */
 .reserva-form label {
-  display: block;
-  margin-top: 15px;
   font-weight: 600;
 }
 
+/* Inputs y selects */
 .reserva-form select,
 .reserva-form input {
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
+  padding: 12px;
   border-radius: 10px;
   border: 1px solid #ddd;
+  font-size: 15px;
+  box-sizing: border-box;
 }
 
+/* Botón de enviar */
 .reserva-form button {
-  margin-top: 25px;
+  margin-top: 10px;
   width: 100%;
   padding: 12px;
   border: none;
   border-radius: 10px;
   background: #4a72ff;
   color: white;
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.25s;
 }
 
-/* Recorrido */
+.reserva-form button:hover {
+  background: #355ff0;
+  transform: translateY(-2px);
+}
+
+/* ================================
+   RECORRIDO
+================================ */
 .recorrido-container {
   text-align: center;
+  margin-top: 40px;
 }
 
 .recorrido-imagen {
   width: 500px;
+  max-width: 90%;
   height: auto;
   border-radius: 15px;
   margin-top: 20px;
 }
 
-/* Verificar */
+/* ================================
+   VERIFICAR CÓDIGO
+================================ */
 .codigo-container {
   text-align: center;
   max-width: 350px;
-  margin: auto;
+  margin: 40px auto;
 }
 
 .codigo-container input {
-  width: 150px;
+  width: 160px;
   text-align: center;
   font-size: 22px;
   letter-spacing: 4px;
   padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
 .codigo-container button {
   margin-top: 20px;
-  padding: 10px 20px;
+  padding: 12px 20px;
   background: #4a72ff;
   color: white;
+  font-weight: 600;
   border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
-/* Final */
-.finalizado-container {
+.codigo-container button:hover {
+  background: #355ff0;
+}
+
+/* ================================
+   FEEDBACK FINAL
+================================ */
+.feedback-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
   text-align: center;
-  margin-top: 50px;
+}
+
+.feedback-container h3 {
+  margin-bottom: 10px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+/* Comentarios */
+.feedback-textarea {
+  width: 100%;
+  height: 120px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  resize: none;
+  box-sizing: border-box;
+  margin-top: 10px;
+}
+
+/* Select de calificación */
+.feedback-select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* Botón enviar opinión */
+.feedback-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 18px;
+  border: none;
+  border-radius: 12px;
+  background: #4a72ff;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.feedback-btn:hover {
+  background: #355ff0;
+  transform: translateY(-2px);
+}
+
+/* Botón reiniciar */
+.reiniciar-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #e5e7eb;
+  color: #333;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.reiniciar-btn:hover {
+  background: #d1d5db;
+  transform: translateY(-2px);
+}
+/* INPUT UNIFORME (para form y feedback) */
+.reserva-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+/* Botón principal (igual que el del formulario) */
+.reserva-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #4a72ff;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.reserva-button:hover {
+  background: #355ff0;
+  transform: translateY(-2px);
+}
+
+/* Botón secundario */
+.reserva-secondary {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #e5e7eb;
+  color: #333;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.reserva-secondary:hover {
+  background: #d1d5db;
+  transform: translateY(-2px);
 }

@@ -9,31 +9,34 @@ export default function Reservas() {
   const [correo, setCorreo] = useState("");
 
   const [pedidoId, setPedidoId] = useState(null);
-  const [fase, setFase] = useState("form"); 
+  const [fase, setFase] = useState("form");
   const [imagenesTrayecto, setImagenesTrayecto] = useState([]);
   const [imagenActual, setImagenActual] = useState(0);
   const [codigoVerificacion, setCodigoVerificacion] = useState("");
 
+  // NUEVOS ESTADOS PARA FEEDBACK
+  const [comentarios, setComentarios] = useState("");
+  const [rating, setRating] = useState("");
+
   // ================================
-  // 1. Cargar drones disponibles
+  // 1. Cargar drones
   // ================================
-  useEffect(() => {
+  const cargarDatos = () => {
     fetch("http://localhost:4000/api/dispositivos/disponibles")
       .then((res) => res.json())
       .then((data) => setDrones(data || []));
-  }, []);
 
-  // ================================
-  // 2. Cargar rutas disponibles
-  // ================================
-  useEffect(() => {
     fetch("http://localhost:4000/api/trayectos")
       .then((res) => res.json())
       .then((data) => setRutas(data || []));
+  };
+
+  useEffect(() => {
+    cargarDatos();
   }, []);
 
   // ===========================================
-  // 3. ENVIAR FORMULARIO Y COMENZAR RECORRIDO
+  // 2. Enviar pedido
   // ===========================================
   const enviarPedido = async (e) => {
     e.preventDefault();
@@ -49,9 +52,8 @@ export default function Reservas() {
     if (res.ok) {
       setPedidoId(data.pedidoId);
 
-      // OBTENER RUTA E IMÁGENES (NO JSON.parse)
-      const ruta = rutas.find((r) => r.id === trayectoId);
-      setImagenesTrayecto(ruta.imagenes); // ✔ CORREGIDO
+      const rutaSeleccionada = rutas.find((r) => r.id === trayectoId);
+      setImagenesTrayecto(rutaSeleccionada.imagenes);
 
       setFase("recorrido");
     } else {
@@ -60,7 +62,7 @@ export default function Reservas() {
   };
 
   // ======================================
-  // 4. MOSTRAR IMÁGENES DEL RECORRIDO
+  // 3. Mostrar recorrido
   // ======================================
   useEffect(() => {
     if (fase !== "recorrido") return;
@@ -79,28 +81,75 @@ export default function Reservas() {
   }, [fase, imagenActual, imagenesTrayecto]);
 
   // ======================================
-  // 5. VERIFICAR CÓDIGO
+  // 4. Verificar código
   // ======================================
   const verificarCodigo = async () => {
-    const res = await fetch(`http://localhost:4000/api/pedido/${pedidoId}/verificar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ codigo: codigoVerificacion }),
-    });
+    const res = await fetch(
+      `http://localhost:4000/api/pedido/${pedidoId}/verificar`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo: codigoVerificacion }),
+      }
+    );
 
     const data = await res.json();
 
     if (res.ok) {
-      alert("Entrega confirmada exitosamente ✔🚁");
       setFase("completado");
     } else {
       alert(data.mensaje || "Código incorrecto");
     }
   };
 
+  // ======================================
+  // 5. Guardar feedback
+  // ======================================
+  const guardarFeedback = async () => {
+    if (!rating) {
+      alert("Por favor selecciona una calificación");
+      return;
+    }
+
+    const res = await fetch("http://localhost:4000/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pedidoId,
+        rating,
+        comentarios,
+      }),
+    });
+
+    if (res.ok) {
+      alert("¡Gracias por tu opinión!");
+      reiniciar();
+    } else {
+      alert("Error guardando el feedback");
+    }
+  };
+
+  // ======================================
+  // 6. Reiniciar flujo
+  // ======================================
+  const reiniciar = () => {
+    setDispositivoId("");
+    setTrayectoId("");
+    setCorreo("");
+    setPedidoId(null);
+    setImagenesTrayecto([]);
+    setImagenActual(0);
+    setCodigoVerificacion("");
+    setComentarios("");
+    setRating("");
+    setFase("form");
+    cargarDatos();
+  };
+
   // ================================
-  // RENDER SEGÚN FASE
+  // 7. Render por fase
   // ================================
+
   if (fase === "form") {
     return (
       <div className="reserva-container">
@@ -108,7 +157,11 @@ export default function Reservas() {
         <form onSubmit={enviarPedido} className="reserva-form">
 
           <label>Dron disponible</label>
-          <select value={dispositivoId} onChange={(e) => setDispositivoId(e.target.value)} required>
+          <select
+            value={dispositivoId}
+            onChange={(e) => setDispositivoId(e.target.value)}
+            required
+          >
             <option value="">Seleccione un dron</option>
             {drones.map((d) => (
               <option key={d.id} value={d.id}>
@@ -118,7 +171,11 @@ export default function Reservas() {
           </select>
 
           <label>Ruta</label>
-          <select value={trayectoId} onChange={(e) => setTrayectoId(e.target.value)} required>
+          <select
+            value={trayectoId}
+            onChange={(e) => setTrayectoId(e.target.value)}
+            required
+          >
             <option value="">Seleccione ruta</option>
             {rutas.map((r) => (
               <option key={r.id} value={r.id}>
@@ -142,13 +199,11 @@ export default function Reservas() {
     );
   }
 
-  // FASE: Recorrer imágenes
   if (fase === "recorrido") {
     return (
       <div className="recorrido-container">
         <h2>El dron está en camino...</h2>
         <p>Mostrando ruta</p>
-
         <img
           src={imagenesTrayecto[imagenActual]}
           alt="Dron en camino"
@@ -158,7 +213,6 @@ export default function Reservas() {
     );
   }
 
-  // FASE: Verificar código
   if (fase === "verificar") {
     return (
       <div className="codigo-container">
@@ -177,13 +231,50 @@ export default function Reservas() {
     );
   }
 
-  // FASE: Completado
-  if (fase === "completado") {
-    return (
-      <div className="finalizado-container">
-        <h2>Pedido completado ✔</h2>
-        <p>Gracias por usar DroneDelivery 🚁</p>
+ if (fase === "completado") {
+  return (
+    <div className="page-container">
+      <div className="reserva-container">   {/* MISMA CAJA DEL FORM */}
+
+        <h2 style={{ textAlign: "center" }}>Pedido completado ✔</h2>
+        <p style={{ textAlign: "center", marginBottom: "20px" }}>
+          Gracias por usar DroneDelivery 🚁
+        </p>
+
+        <h3 style={{ marginBottom: "10px" }}>¿Cómo fue tu experiencia?</h3>
+
+        <textarea
+          className="reserva-input"    
+          placeholder="Escribe tus comentarios..."
+          value={comentarios}
+          onChange={(e) => setComentarios(e.target.value)}
+        />
+
+        <label style={{ marginTop: "15px", fontWeight: "600" }}>Calificación:</label>
+
+        <select
+          className="reserva-input"
+          value={rating}
+          onChange={(e) => setRating(e.target.value)}
+        >
+          <option value="">Selecciona ⭐</option>
+          <option value="1">⭐</option>
+          <option value="2">⭐⭐</option>
+          <option value="3">⭐⭐⭐</option>
+          <option value="4">⭐⭐⭐⭐</option>
+          <option value="5">⭐⭐⭐⭐⭐</option>
+        </select>
+
+        <button className="reserva-button" onClick={guardarFeedback}>
+          Enviar Opinión
+        </button>
+
+        <button className="reserva-secondary" onClick={reiniciar}>
+          Hacer otro pedido
+        </button>
+
       </div>
+    </div>
     );
-  }
+  } 
 }

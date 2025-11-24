@@ -142,5 +142,54 @@ router.get("/trayectos", async (req, res) => {
 
   res.json(data || [])
 })
+router.post("/feedback", async (req, res) => {
+  try {
+    const { pedidoId, rating, comentarios } = req.body;
+
+    if (!pedidoId || !rating) {
+      return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
+    }
+
+    // Buscar servicio asociado al pedido
+    const { data: servicio, error: servicioError } = await supabase
+      .from("servicios")
+      .select("id")
+      .eq("pedido_id", pedidoId)
+      .maybeSingle();
+
+    if (servicioError) {
+      console.error("Error buscando servicio:", servicioError);
+      return res.status(500).json({ mensaje: "No se pudo buscar el servicio" });
+    }
+
+    if (!servicio) {
+      return res.status(404).json({ mensaje: "No existe un servicio para este pedido" });
+    }
+
+    // Guardar feedback en columnas reales: comentario + calificacion
+    const { error: updateError } = await supabase
+      .from("servicios")
+      .update({
+        comentario_cliente: comentarios,     // <-- CAMPO REAL
+        calificacion: Number(rating) // <-- CAMPO REAL
+      })
+      .eq("id", servicio.id);
+
+    if (updateError) {
+      console.error("Error actualizando servicio:", updateError);
+      return res.status(500).json({ mensaje: "No se pudo guardar el feedback" });
+    }
+
+    return res.json({ mensaje: "Feedback guardado correctamente" });
+
+  } catch (e) {
+    console.error("Error guardando feedback:", e);
+    res.status(500).json({ mensaje: "Error interno guardando feedback" });
+  }
+});
+
+
 
 export default router
+
+
