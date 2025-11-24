@@ -9,31 +9,25 @@ const router = express.Router()
 // ======================================================
 router.post("/pedido", async (req, res) => {
   try {
-    const { dispositivoId, trayectoId, correo } = req.body
+    const { dispositivoId, trayectoId, correo, fecha } = req.body;
 
-    if (!dispositivoId || !trayectoId || !correo) {
-      return res.status(400).json({ mensaje: "Faltan datos" })
+    if (!dispositivoId || !trayectoId || !correo || !fecha) {
+      return res.status(400).json({ mensaje: "Faltan datos" });
     }
 
     // Obtener imágenes del trayecto
-    const { data: trayecto, error: trayectoError } = await supabase
+    const { data: trayecto } = await supabase
       .from("trayectos")
       .select("imagenes")
       .eq("id", trayectoId)
-      .single()
+      .single();
 
-    if (trayectoError)
-      return res.status(404).json({ mensaje: "Trayecto no encontrado" })
+    const imagenes = Array.isArray(trayecto.imagenes) ? trayecto.imagenes : [];
 
-    const imagenes = Array.isArray(trayecto.imagenes)
-      ? trayecto.imagenes
-      : []
-
-    // Crear código
-    const codigo = Math.floor(1000 + Math.random() * 9000).toString()
+    const codigo = Math.floor(1000 + Math.random() * 9000).toString();
 
     // Crear pedido
-    const { data: pedido, error: pedidoError } = await supabase
+    const { data: pedido } = await supabase
       .from("pedidos")
       .insert({
         dispositivo_id: dispositivoId,
@@ -41,12 +35,11 @@ router.post("/pedido", async (req, res) => {
         correo,
         codigo_acceso: codigo,
         estado: "en_camino",
-        fecha_inicio: new Date().toISOString()
+        fecha_inicio: fecha,
+        fecha_entrega: fecha,
       })
       .select()
-      .single()
-
-    if (pedidoError) return res.status(500).json({ mensaje: "Error creando pedido" })
+      .single();
 
     // Enviar correo
     await transporter.sendMail({
@@ -57,49 +50,42 @@ router.post("/pedido", async (req, res) => {
         <h2>Tu código de entrega</h2>
         <p>Utiliza este código para confirmar la entrega:</p>
         <h1 style="font-size: 40px; letter-spacing: 4px;">${codigo}</h1>
-      `
-    })
+      `,
+    });
 
-    return res.json({
-      mensaje: "Pedido creado y correo enviado",
-      pedidoId: pedido.id,
-      imagenes
-    })
+    res.json({ mensaje: "Pedido creado", pedidoId: pedido.id, imagenes });
   } catch (e) {
-    console.error(e)
-    return res.status(500).json({ mensaje: "Error interno" })
+    console.error(e);
+    res.status(500).json({ mensaje: "Error interno" });
   }
-})
-
+});
 
 // ======================================================
-// 🚀 VERIFICAR CÓDIGO Y REGISTRAR SERVICIO
+// 🚀 VERIFICAR CÓDIGO
 // ======================================================
 router.post("/pedido/:id/verificar", async (req, res) => {
   try {
-    const { id } = req.params
-    const { codigo } = req.body
+    const { id } = req.params;
+    const { codigo } = req.body;
 
     const { data: pedido } = await supabase
       .from("pedidos")
       .select("*")
       .eq("id", id)
-      .single()
+      .single();
 
-    if (!pedido) return res.status(404).json({ mensaje: "Pedido no existe" })
+    if (!pedido) return res.status(404).json({ mensaje: "Pedido no existe" });
     if (pedido.codigo_acceso !== codigo)
-      return res.status(400).json({ mensaje: "Código incorrecto" })
+      return res.status(400).json({ mensaje: "Código incorrecto" });
 
-    // Completar pedido
     await supabase
       .from("pedidos")
       .update({
         estado: "completado",
-        fecha_entrega: new Date().toISOString()
+        fecha_entrega: pedido.fecha_inicio,
       })
-      .eq("id", id)
+      .eq("id", id);
 
-    // Crear registro en servicios
     await supabase
       .from("servicios")
       .insert({
@@ -107,89 +93,83 @@ router.post("/pedido/:id/verificar", async (req, res) => {
         dispositivo_id: pedido.dispositivo_id,
         trayecto_id: pedido.trayecto_id,
         hora_salida: pedido.fecha_inicio,
-        hora_llegada: new Date().toISOString(),
-        estado: "completado"
-      })
+        hora_llegada: pedido.fecha_inicio,
+        estado: "completado",
+      });
 
-    return res.json({ mensaje: "Entrega confirmada" })
+    res.json({ mensaje: "Entrega confirmada" });
   } catch (e) {
-    console.error(e)
-    res.status(500).json({ mensaje: "Error verificando" })
+    console.error(e);
+    res.status(500).json({ mensaje: "Error interno" });
   }
-})
-
+});
 
 // ======================================================
-// 🔓 DRONES DISPONIBLES
+// 🌦️ CLIMA (PÚBLICO)
+// ======================================================
+router.get("/clima/:dia", async (req, res) => {
+  const { dia } = req.params;
+
+  const { data, error } = await supabase
+    .from("clima")
+    .select("*")
+    .eq("dia", dia)
+    .single();
+
+  if (error) return res.status(404).json({ mensaje: "Clima no encontrado" });
+
+  res.json(data);
+});
+
+// ======================================================
+// DRONES DISPONIBLES
 // ======================================================
 router.get("/dispositivos/disponibles", async (req, res) => {
   const { data } = await supabase
     .from("dispositivos")
     .select("*")
-    .eq("estado", "disponible")
+    .eq("estado", "disponible");
 
-  res.json(data || [])
-})
-
+  res.json(data);
+});
 
 // ======================================================
-// 🔓 TRAYECTOS
+// TRAYECTOS
 // ======================================================
 router.get("/trayectos", async (req, res) => {
   const { data } = await supabase
     .from("trayectos")
-    .select("*")
+    .select("*");
 
-  res.json(data || [])
-})
+  res.json(data);
+});
+
+// ======================================================
+// FEEDBACK
+// ======================================================
 router.post("/feedback", async (req, res) => {
   try {
     const { pedidoId, rating, comentarios } = req.body;
 
-    if (!pedidoId || !rating) {
-      return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
-    }
-
-    // Buscar servicio asociado al pedido
-    const { data: servicio, error: servicioError } = await supabase
+    const { data: servicio } = await supabase
       .from("servicios")
       .select("id")
       .eq("pedido_id", pedidoId)
       .maybeSingle();
 
-    if (servicioError) {
-      console.error("Error buscando servicio:", servicioError);
-      return res.status(500).json({ mensaje: "No se pudo buscar el servicio" });
-    }
-
-    if (!servicio) {
-      return res.status(404).json({ mensaje: "No existe un servicio para este pedido" });
-    }
-
-    // Guardar feedback en columnas reales: comentario + calificacion
-    const { error: updateError } = await supabase
+    await supabase
       .from("servicios")
       .update({
-        comentario_cliente: comentarios,     // <-- CAMPO REAL
-        calificacion: Number(rating) // <-- CAMPO REAL
+        comentario_cliente: comentarios,
+        calificacion: Number(rating),
       })
       .eq("id", servicio.id);
 
-    if (updateError) {
-      console.error("Error actualizando servicio:", updateError);
-      return res.status(500).json({ mensaje: "No se pudo guardar el feedback" });
-    }
-
-    return res.json({ mensaje: "Feedback guardado correctamente" });
-
+    res.json({ mensaje: "Feedback guardado" });
   } catch (e) {
-    console.error("Error guardando feedback:", e);
-    res.status(500).json({ mensaje: "Error interno guardando feedback" });
+    console.error(e);
+    res.status(500).json({ mensaje: "Error guardando feedback" });
   }
 });
 
-
-
-export default router
-
-
+export default router;

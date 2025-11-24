@@ -7,6 +7,15 @@ export default function Reservas() {
   const [dispositivoId, setDispositivoId] = useState("");
   const [trayectoId, setTrayectoId] = useState("");
   const [correo, setCorreo] = useState("");
+  const [fecha, setFecha] = useState("");
+
+  // 🔥 Nuevo: clima y bloqueo
+  const [clima, setClima] = useState(null);
+  const [bloqueadoPorClima, setBloqueadoPorClima] = useState(false);
+
+  // feedback
+  const [comentarios, setComentarios] = useState("");
+  const [rating, setRating] = useState("");
 
   const [pedidoId, setPedidoId] = useState(null);
   const [fase, setFase] = useState("form");
@@ -14,37 +23,49 @@ export default function Reservas() {
   const [imagenActual, setImagenActual] = useState(0);
   const [codigoVerificacion, setCodigoVerificacion] = useState("");
 
-  // NUEVOS ESTADOS PARA FEEDBACK
-  const [comentarios, setComentarios] = useState("");
-  const [rating, setRating] = useState("");
-
-  // ================================
-  // 1. Cargar drones
-  // ================================
+  // carga inicial
   const cargarDatos = () => {
     fetch("http://localhost:4000/api/dispositivos/disponibles")
-      .then((res) => res.json())
-      .then((data) => setDrones(data || []));
+      .then((r) => r.json())
+      .then(setDrones);
 
     fetch("http://localhost:4000/api/trayectos")
-      .then((res) => res.json())
-      .then((data) => setRutas(data || []));
+      .then((r) => r.json())
+      .then(setRutas);
   };
 
   useEffect(() => {
     cargarDatos();
   }, []);
 
-  // ===========================================
-  // 2. Enviar pedido
-  // ===========================================
+  // 🔥 Cargar clima según día seleccionado
+  const cargarClima = async (nuevaFecha) => {
+    const dia = nuevaFecha.split("-")[2]; // "2025-11-24" → "24"
+
+    const res = await fetch(`http://localhost:4000/api/clima/${Number(dia)}`);
+    const data = await res.json();
+    setClima(data);
+
+    // BLOQUEO por lluvia (tu BD usa TRUE/FALSE)
+    if (data.lluvia === true) {
+      setBloqueadoPorClima(true);
+    } else {
+      setBloqueadoPorClima(false);
+    }
+  };
+
   const enviarPedido = async (e) => {
     e.preventDefault();
 
     const res = await fetch("http://localhost:4000/api/pedido", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dispositivoId, trayectoId, correo }),
+      body: JSON.stringify({
+        dispositivoId,
+        trayectoId,
+        correo,
+        fecha, // 🔥 enviamos la fecha
+      }),
     });
 
     const data = await res.json();
@@ -52,8 +73,8 @@ export default function Reservas() {
     if (res.ok) {
       setPedidoId(data.pedidoId);
 
-      const rutaSeleccionada = rutas.find((r) => r.id === trayectoId);
-      setImagenesTrayecto(rutaSeleccionada.imagenes);
+      const ruta = rutas.find((r) => r.id === trayectoId);
+      setImagenesTrayecto(ruta.imagenes);
 
       setFase("recorrido");
     } else {
@@ -61,9 +82,7 @@ export default function Reservas() {
     }
   };
 
-  // ======================================
-  // 3. Mostrar recorrido
-  // ======================================
+  // Recorrido automático
   useEffect(() => {
     if (fase !== "recorrido") return;
 
@@ -71,7 +90,6 @@ export default function Reservas() {
       const timer = setTimeout(() => {
         setImagenActual((i) => i + 1);
       }, 4000);
-
       return () => clearTimeout(timer);
     } else {
       setTimeout(() => {
@@ -80,9 +98,7 @@ export default function Reservas() {
     }
   }, [fase, imagenActual, imagenesTrayecto]);
 
-  // ======================================
-  // 4. Verificar código
-  // ======================================
+  // Verificar código
   const verificarCodigo = async () => {
     const res = await fetch(
       `http://localhost:4000/api/pedido/${pedidoId}/verificar`,
@@ -102,14 +118,9 @@ export default function Reservas() {
     }
   };
 
-  // ======================================
-  // 5. Guardar feedback
-  // ======================================
+  // Guardar feedback
   const guardarFeedback = async () => {
-    if (!rating) {
-      alert("Por favor selecciona una calificación");
-      return;
-    }
+    if (!rating) return alert("Selecciona una calificación");
 
     const res = await fetch("http://localhost:4000/api/feedback", {
       method: "POST",
@@ -125,17 +136,18 @@ export default function Reservas() {
       alert("¡Gracias por tu opinión!");
       reiniciar();
     } else {
-      alert("Error guardando el feedback");
+      alert("Error guardando feedback");
     }
   };
 
-  // ======================================
-  // 6. Reiniciar flujo
-  // ======================================
+  // Reiniciar flujo
   const reiniciar = () => {
     setDispositivoId("");
     setTrayectoId("");
     setCorreo("");
+    setFecha("");
+    setClima(null);
+    setBloqueadoPorClima(false);
     setPedidoId(null);
     setImagenesTrayecto([]);
     setImagenActual(0);
@@ -146,59 +158,101 @@ export default function Reservas() {
     cargarDatos();
   };
 
-  // ================================
-  // 7. Render por fase
-  // ================================
-
+  // =========================
+  // FORMULARIO INICIAL
+  // =========================
   if (fase === "form") {
     return (
-      <div className="reserva-container">
-        <h2>Realizar Pedido</h2>
-        <form onSubmit={enviarPedido} className="reserva-form">
+      <div className="page-container">
+        <div className="reserva-container">
+          <h2>Realizar Pedido</h2>
 
-          <label>Dron disponible</label>
-          <select
-            value={dispositivoId}
-            onChange={(e) => setDispositivoId(e.target.value)}
-            required
-          >
-            <option value="">Seleccione un dron</option>
-            {drones.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.modelo} ({d.tipo})
-              </option>
-            ))}
-          </select>
+          <form onSubmit={enviarPedido} className="reserva-form">
 
-          <label>Ruta</label>
-          <select
-            value={trayectoId}
-            onChange={(e) => setTrayectoId(e.target.value)}
-            required
-          >
-            <option value="">Seleccione ruta</option>
-            {rutas.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.nombre}
-              </option>
-            ))}
-          </select>
+            {/* DRON */}
+            <label>Dron disponible</label>
+            <select
+              value={dispositivoId}
+              onChange={(e) => setDispositivoId(e.target.value)}
+              required
+            >
+              <option value="">Seleccione un dron</option>
+              {drones.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.modelo} ({d.tipo})
+                </option>
+              ))}
+            </select>
 
-          <label>Correo del cliente</label>
-          <input
-            type="email"
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
-            placeholder="cliente@correo.com"
-            required
-          />
+            {/* RUTA */}
+            <label>Ruta</label>
+            <select
+              value={trayectoId}
+              onChange={(e) => setTrayectoId(e.target.value)}
+              required
+            >
+              <option value="">Seleccione ruta</option>
+              {rutas.map((r) => (
+                <option key={r.id} value={r.id}>{r.nombre}</option>
+              ))}
+            </select>
 
-          <button type="submit">Enviar Pedido</button>
-        </form>
+            {/* FECHA */}
+            <label>Fecha del pedido</label>
+            <input
+              type="date"
+              className="reserva-input"
+              min={new Date().toISOString().split("T")[0]}
+              value={fecha}
+              onChange={(e) => {
+                setFecha(e.target.value);
+                cargarClima(e.target.value);
+              }}
+              required
+            />
+
+            {/* CLIMA */}
+            {clima && (
+              <div className="clima-box">
+                <p><strong>Clima para ese día:</strong></p>
+                <p>🌡 Temperatura: {clima.temperatura}°C</p>
+                <p>💨 Viento: {clima.viento} km/h</p>
+                <p>🌧 Lluvia: {clima.lluvia ? "Sí" : "No"}</p>
+                <p>👁 Visibilidad: {clima.visibilidad} km</p>
+                <p>📝 {clima.descripcion}</p>
+              </div>
+            )}
+
+            {/* ALERTA POR LLUVIA */}
+            {bloqueadoPorClima && (
+              <div className="clima-alerta">
+                📛 <strong>No se puede solicitar el dron este día.</strong><br />
+                La predicción indica <strong>lluvia</strong>.<br />
+                Por favor selecciona otra fecha para garantizar un vuelo seguro.
+              </div>
+            )}
+
+            {/* CORREO */}
+            <label>Correo del cliente</label>
+            <input
+              type="email"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
+              placeholder="cliente@correo.com"
+              required
+            />
+
+            {/* BOTÓN */}
+            <button type="submit" disabled={bloqueadoPorClima}>
+              Enviar Pedido
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
 
+  // RECORRIDO
   if (fase === "recorrido") {
     return (
       <div className="recorrido-container">
@@ -213,6 +267,7 @@ export default function Reservas() {
     );
   }
 
+  // VERIFICAR
   if (fase === "verificar") {
     return (
       <div className="codigo-container">
@@ -231,50 +286,51 @@ export default function Reservas() {
     );
   }
 
- if (fase === "completado") {
-  return (
-    <div className="page-container">
-      <div className="reserva-container">   {/* MISMA CAJA DEL FORM */}
+  // FEEDBACK
+  if (fase === "completado") {
+    return (
+      <div className="page-container">
+        <div className="reserva-container">
+          <h2 style={{ textAlign: "center" }}>Pedido completado ✔</h2>
+          <p style={{ textAlign: "center", marginBottom: "20px" }}>
+            Gracias por usar DroneDelivery 🚁
+          </p>
 
-        <h2 style={{ textAlign: "center" }}>Pedido completado ✔</h2>
-        <p style={{ textAlign: "center", marginBottom: "20px" }}>
-          Gracias por usar DroneDelivery 🚁
-        </p>
+          <h3>¿Cómo fue tu experiencia?</h3>
 
-        <h3 style={{ marginBottom: "10px" }}>¿Cómo fue tu experiencia?</h3>
+          <textarea
+            className="reserva-input"
+            placeholder="Escribe tus comentarios..."
+            value={comentarios}
+            onChange={(e) => setComentarios(e.target.value)}
+          />
 
-        <textarea
-          className="reserva-input"    
-          placeholder="Escribe tus comentarios..."
-          value={comentarios}
-          onChange={(e) => setComentarios(e.target.value)}
-        />
+          <label style={{ marginTop: "15px", fontWeight: "600" }}>
+            Calificación:
+          </label>
 
-        <label style={{ marginTop: "15px", fontWeight: "600" }}>Calificación:</label>
+          <select
+            className="reserva-input"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+          >
+            <option value="">Selecciona ⭐</option>
+            <option value="1">⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="5">⭐⭐⭐⭐⭐</option>
+          </select>
 
-        <select
-          className="reserva-input"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-        >
-          <option value="">Selecciona ⭐</option>
-          <option value="1">⭐</option>
-          <option value="2">⭐⭐</option>
-          <option value="3">⭐⭐⭐</option>
-          <option value="4">⭐⭐⭐⭐</option>
-          <option value="5">⭐⭐⭐⭐⭐</option>
-        </select>
+          <button className="reserva-button" onClick={guardarFeedback}>
+            Enviar Opinión
+          </button>
 
-        <button className="reserva-button" onClick={guardarFeedback}>
-          Enviar Opinión
-        </button>
-
-        <button className="reserva-secondary" onClick={reiniciar}>
-          Hacer otro pedido
-        </button>
-
+          <button className="reserva-secondary" onClick={reiniciar}>
+            Hacer otro pedido
+          </button>
+        </div>
       </div>
-    </div>
     );
-  } 
+  }
 }

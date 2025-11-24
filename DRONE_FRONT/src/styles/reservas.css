@@ -249,3 +249,56 @@
   background: #d1d5db;
   transform: translateY(-2px);
 }
+
+/* ===============================
+   ADVERTENCIA DE CLIMA
+================================= */
+.clima-alerta {
+  margin-top: 12px;
+  padding: 12px;
+  background: #ffe4e6;         /* Rosado claro */
+  border: 1px solid #fda4af;   /* Borde rosado */
+  color: #b91c1c;              /* Rojo fuerte */
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 500;
+  animation: alertaFade 0.2s ease-in-out;
+}
+
+@keyframes alertaFade {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===============================
+   BOTÓN DESHABILITADO
+================================= */
+.reserva-form button:disabled {
+  background: #9ca3af !important;      /* Gris */
+  cursor: not-allowed !important;
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* evitar efecto hover */
+.reserva-form button:disabled:hover {
+  background: #9ca3af !important;
+  transform: none !important;
+}
+
+/* ===============================
+   COMPATIBLE CON BOTONES DE FEEDBACK
+================================= */
+.reserva-button:disabled {
+  background: #9ca3af !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+.reserva-button:disabled:hover {
+  background: #9ca3af !important;
+  transform: none !important;
+}
+
