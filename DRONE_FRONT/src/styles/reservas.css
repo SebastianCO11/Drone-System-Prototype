@@ -1,0 +1,133 @@
+/* .reservas-container {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+.reservas-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.reservas-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.reservas-form label {
+  font-weight: 600;
+}
+
+.reservas-form select,
+.reservas-form input {
+  padding: 10px;
+  border: 2px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.reservas-btn {
+  margin-top: 10px;
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.reservas-btn:hover {
+  background-color: #4338ca;
+}
+
+.reservas-mensaje {
+  margin-top: 20px;
+  text-align: center;
+  font-weight: 600;
+} */
+.reserva-container {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 450px;
+  margin: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.reserva-form label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+.reserva-form select,
+.reserva-form input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.reserva-form button {
+  margin-top: 25px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #4a72ff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Recorrido */
+.recorrido-container {
+  text-align: center;
+}
+
+.recorrido-imagen {
+  width: 500px;
+  height: auto;
+  border-radius: 15px;
+  margin-top: 20px;
+}
+
+/* Verificar */
+.codigo-container {
+  text-align: center;
+  max-width: 350px;
+  margin: auto;
+}
+
+.codigo-container input {
+  width: 150px;
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 4px;
+  padding: 10px;
+}
+
+.codigo-container button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #4a72ff;
+  color: white;
+  border-radius: 10px;
+}
+
+/* Final */
+.finalizado-container {
+  text-align: center;
+  margin-top: 50px;
+}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Navbar from '../pages/Navbar'
 import DataTable from '../pages/DataTable'
 import RoutesPanel from '../pages/RoutesPanel'
+import Reservas from './Reservas'
 import { Auth, UsersAPI, DispositivosAPI, ReservasAPI, ServiciosAPI, ClimaAPI, LogsAPI } from '../api'
 import '../styles/dashboard.css'
 
@@ -70,7 +71,6 @@ export default function Dashboard({ onLogout }) {
             result = await LogsAPI.getAll()
             break
           case 'Rutas':
-            // Rutas se carga internamente en RoutesPanel
             result = []
             break
           default:
@@ -123,7 +123,6 @@ export default function Dashboard({ onLogout }) {
       />
 
       <main className="dashboard-content">
-        {/* Header de la página actual */}
         <header className="dashboard-header">
           <div className="header-title">
             <span className="header-icon">{viewIcons[view] || '📊'}</span>
@@ -137,7 +136,6 @@ export default function Dashboard({ onLogout }) {
           </div>
         </header>
 
-        {/* Mensajes de error */}
         {error && (
           <div className="error-banner">
             <span className="error-icon">⚠️</span>
@@ -145,10 +143,12 @@ export default function Dashboard({ onLogout }) {
           </div>
         )}
 
-        {/* Contenido principal */}
         <section className="dashboard-body">
+
           {view === 'Rutas' ? (
             <RoutesPanel />
+          ) : view === 'Reservas' ? (
+            <Reservas />
           ) : loading ? (
             <div className="loading-container">
               <div className="loading-spinner"></div>
@@ -165,6 +165,7 @@ export default function Dashboard({ onLogout }) {
               <DataTable data={data} view={view} />
             </div>
           )}
+
         </section>
       </main>
     </div>
